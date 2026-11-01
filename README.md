@@ -1,3 +1,27 @@
+> [!NOTE]
+> **This is the `ac922` branch of [jefflaichunyin/project-maya-ac922](https://github.com/jefflaichunyin/project-maya-ac922).** The branch contains a port of Project Maya for the IBM Power System AC922. The machine has two POWER9 CPUs, six V100-SXM2-16GB GPUs, NVLink 2.0 and 183 GB of RAM.
+>
+> Branch `ac922-pr` contains the same commits without these notes.
+>
+> GLM-5.3-Flash (Maya-S24) runs with 1,048,576 tokens of context on all six cards:
+>
+> | | |
+> |---|---:|
+> | Decode | **72 tokens/s** (three greedy answers of 256 tokens: 72.6, 72.2 and 71.2) |
+> | Prefill | 1,297 tokens/s for 70K tokens, 2,102 tokens/s for 183K tokens |
+> | Context | **1,048,576** tokens, with 1.93 GB of KV cache on the six cards |
+> | VRAM | 14.7 GB of 16 GB on each card |
+>
+> **You must set `MAYA_GLM_NUMA=0` on this machine.** If you use the default value, the engine registers the RAM tier with `cudaHostRegister`. The POWER9 ATS/UVM path then moves these pages, and the kernel stops with an error (`mm/migrate.c:701`). The decode speed also drops by half.
+>
+> Use six cards. Four cards measured 3.6 tokens/s.
+>
+> Use gcc-toolset-13 to build the engine. The system GCC 8.5 of RHEL 8 cannot compile C++20 code.
+>
+> For the build steps, the settings and the measurements, read **[docs/IBM_AC922.md](docs/IBM_AC922.md)**.
+
+---
+
 <h1 align="center">Project Maya</h1>
 
 <p align="center"><b>GLM-5.3-Flash (321 B), DeepSeek-V4.1-Flash-1017 (748 B) and MiniMax-M3.1-Flash (428 B) on your own GPU</b><br>
